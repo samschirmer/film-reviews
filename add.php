@@ -10,8 +10,30 @@
 <?php
 include 'php/config.php';
 
-$filmid = $_GET['id'];
+$add_type = $_GET['type'];
 
+if ($add_type == "film") {
+
+	echo '<h1>Add Film</h1>';
+	echo '<form action="submit.php" method="POST">';
+	echo '<input name="title" placeholder="Enter Title" />';
+	echo '<input name="year" placholder="Year" />';
+	echo '<input name="type" type="hidden" value="add_film" />';
+	echo '<button type="submit">Submit</button>';
+	echo '</form>';
+
+} elseif ($add_type == "tag") {
+
+	echo '<h1>Add Tag</h1>';
+	echo '<form action="submit.php" method="POST">';
+	echo '<input name="tag" placeholder="Enter Tag Name" />';
+	echo '<input name="type" type="hidden" value="add_tag" />';
+	echo '<button type="submit">Submit</button>';
+	echo '</form>';
+}
+
+
+/*
 # Getting film metadata
 $select_films_sql = '	SELECT 	f.Name, f.Year, t.TagName, t.TagID 
 			FROM 	tblFilms AS f LEFT JOIN 
@@ -124,12 +146,13 @@ for ($i = 0; $i < count($userids); $i++) {
 echo '
 </table>';
 echo '
-<input type="hidden" name="type" value="edit_rating" />
+<input type="hidden" name="submit_type" value="edit_rating" />
 <input type="hidden" name="filmid" value="' . $filmid . '" />
 <input type="hidden" name="last_id" value="' . $last_id . '" />
 ';
 echo '<button type="submit">Submit</button>
 	</form>';
+*/
 ?>
 </body>
 </html>

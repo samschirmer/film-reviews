@@ -63,7 +63,7 @@ foreach ($userids as $user) {
 	array_push($column_order, $user["userid"]);
 }
 
-echo '<td>Average</td></tr>';
+echo '<td><strong>Average</strong></td></tr>';
 
 ##### QUERY #####
 # Getting user metadata, ratings, and filmid/title
@@ -112,7 +112,6 @@ while ($rows = $select_orphans->fetch(PDO::FETCH_ASSOC)) {
 	$ratings_counter ++;
 }
 
-
 ################################
 #
 # FUNCTION: getAverage
@@ -120,11 +119,12 @@ while ($rows = $select_orphans->fetch(PDO::FETCH_ASSOC)) {
 # to the end of each row and
 # calculates the average
 #
+#  $avg_flag = getAverage($column_order[$col_counter], count($column_order), $all_ratings);
 ################################
 $all_avg = [];
 function getAverage($curr_col, $max_cols, $row_rating) {
 	global $all_avg;
-	if ($curr_col == $max_cols) {
+	if (intval($curr_col) >= $max_cols) {
 		$avg = round((array_sum($row_rating) / count($row_rating)), 2);
 		$rounded_rating = round($avg * 2, 0) / 2;
 		$decimal_flag = strlen(strval($rounded_rating));
@@ -228,7 +228,7 @@ while ($col_counter < count($column_order)) {
 }	
 
 # getting user averages
-echo '<tr id="user_averages"><td>Average</td>';
+echo '<tr id="user_averages"><td><strong>Average</strong></td>';
 
 for ($i = 0; $i < $num_users; $i++) {
 	$curr_array = $userids[$i];
@@ -251,6 +251,7 @@ for ($i = 0; $i < $num_users; $i++) {
 	
 	echo '<td><strong>' . round($avg, 2) . '</strong></td>';
 }
+
 echo '<td><strong>' . round((array_sum($all_avg) / (count($all_avg))), 2)  . '</strong></td></tr>';
 
 echo '</table>';

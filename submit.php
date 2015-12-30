@@ -1,8 +1,16 @@
 <?php
 include 'php/config.php';
 
+$submit_type = $_POST["type"];
+
+##########################################
+#
+#	HANDLING RATINGS UPDATES
+#
+##########################################
+if ($submit_type == "edit_rating") {
+
 $filmid = $_POST["filmid"];
-$submit_type = $_POST["submit_type"];
 $last_id = $_POST["last_id"];
 
 $ratings = [];
@@ -13,13 +21,7 @@ for ($i = 1; $i < ($last_id + 1); $i++) {
         }
 }
 
-##########################################
-#
-#	HANDLING RATINGS UPDATES
-#
-##########################################
-
-for ($i = 0; $i < $last_id; $i++) {
+for ($i = 0; $i <= $last_id; $i++) {
 	if (isset($ratings[$i])) {
 		# building array of userids that require INSERT
 		$select_i_ratings_sql = 'SELECT u.UserID FROM tblUsers AS u WHERE (u.UserID = :userid) AND (u.UserID NOT IN (SELECT UserID FROM tblRatings WHERE (FilmID = :filmid) AND (RecordStatusID = 1)))';
@@ -74,7 +76,150 @@ for ($i = 0; $i < $last_id; $i++) {
 }
 
 header('Location: films?id=' . $filmid);
+}
 
+##########################################
+#
+#	ADD NEW FILMS
+#
+##########################################
+elseif ($submit_type == "add_film") {
 
+$title = $_POST["title"];
+$year = $_POST["year"];
+$dupes = [];
 
+# checking for duplicates based on title
+$select_dupes_sql = 'SELECT FilmID FROM tblFilms WHERE (RecordStatusID = 1) AND (Name = :title)';
+$select_dupes = $db->prepare($select_dupes_sql);
+$select_dupes->execute(array(':title' => $title)) or die(print_r($db->errorInfo(), true));
+
+while ($rows = $select_dupes->fetch(PDO::FETCH_ASSOC)) {
+	array_push($dupes, $row["FilmID"]);
+}
+
+if (count($dupes) > 0) {
+	# redirecting to error page
+	header('Location: error?type=dupe_film&id=' . $dupes[0]);
+} else {
+	# insert query
+	$insert_film_sql = 'INSERT INTO tblFilms (Name, Year) VALUES (:title, :year)';
+	$insert_film = $db->prepare($insert_film_sql);
+	$insert_film->execute(array(':title' => $title, ':year' => $year)) or die(print_r($db->errorInfo(), true));
+	
+	# pulling filmid for redirect
+	$select_new_film_sql = 'SELECT FilmID FROM tblFilms WHERE (RecordStatusID = 1) ORDER BY FilmID DESC LIMIT 1';
+	$select_new_film = $db->prepare($select_new_film_sql);
+	$select_new_film->execute() or die(print_r($db->errorInfo(), true));
+	
+	while ($rows = $select_new_film->fetch(PDO::FETCH_ASSOC)) {
+		$filmid = $rows["FilmID"];
+	}
+	# redirecting to newly-created film page
+	header('Location: films?id=' . $filmid);
+}
+}
+##########################################
+#
+#	ADD NEW TAGS
+#
+##########################################
+elseif ($submit_type == "add_tag") {
+
+$tag_name = $_POST["tag"];
+$dupes = [];
+
+# checking for duplicates based on title
+$select_dupes_sql = 'SELECT TagID FROM tbll_Tags WHERE (RecordStatusID = 1) AND (TagName = :tag_name)';
+$select_dupes = $db->prepare($select_dupes_sql);
+$select_dupes->execute(array(':tag_name' => $tag_name)) or die(print_r($db->errorInfo(), true));
+
+while ($rows = $select_dupes->fetch(PDO::FETCH_ASSOC)) {
+	array_push($dupes, $row["TagID"]);
+}
+
+if (count($dupes) > 0) {
+	# redirecting to error page
+	header('Location: error?type=dupe_tag&id=' . $dupes[0]);
+} else {
+	# insert query
+	$insert_tag_sql = 'INSERT INTO tbll_Tags (TagName) VALUES (:tag_name)';
+	$insert_tag = $db->prepare($insert_tag_sql);
+	$insert_tag->execute(array(':tag_name' => $tag_name)) or die(print_r($db->errorInfo(), true));
+	
+	# pulling tagid for redirect
+	$select_new_tag_sql = 'SELECT TagID FROM tbll_Tags WHERE (RecordStatusID = 1) ORDER BY TagID DESC LIMIT 1';
+	$select_new_tag = $db->prepare($select_new_tag_sql);
+	$select_new_tag->execute() or die(print_r($db->errorInfo(), true));
+	
+	while ($rows = $select_new_tag->fetch(PDO::FETCH_ASSOC)) {
+		$tagid = $rows["TagID"];
+	}
+	# redirecting to newly-created film page
+	header('Location: tags?id=' . $tagid);
+}
+}
+
+##########################################
+#
+#	EDIT EXISTING FILMS
+#
+##########################################
+elseif ($submit_type == "edit_film") {
+
+$title = $_POST["title"];
+$year = $_POST["year"];
+$filmid = $_POST["filmid"];
+$num_tags = $_POST["num_tags"];
+$dupes = [];
+
+# checking for duplicates based on title
+$select_dupes_sql = 'SELECT FilmID FROM tblFilms WHERE (RecordStatusID = 1) AND (Name = :title)';
+$select_dupes = $db->prepare($select_dupes_sql);
+$select_dupes->execute(array(':title' => $title)) or die(print_r($db->errorInfo(), true));
+
+while ($rows = $select_dupes->fetch(PDO::FETCH_ASSOC)) {
+	array_push($dupes, $row["FilmID"]);
+}
+
+# processing the tag changes/additions
+$update_tags = [];
+$total_tags = [];
+$tag_change_flag = 0;
+for ($i = 1; $i <= $num_tags; $i++) {
+	if (($_POST["tag_" . $i] != "") and ($_POST["tag_" . $i] != "delete")) {
+		array_push($update_tags, $_POST["tag_" . $i]);
+		$tag_change_flag = 1;
+	} elseif ($_POST["tag_" . $i] != "delete") {
+		$tag_change_flag = 1;
+	}
+}  
+
+if ((count($dupes) > 0) and ($tag_change_flag == 0)) {
+	# redirecting to error page
+	header('Location: error?type=dupe_film&id=' . $dupes[0]);
+} else {
+
+	# update film query
+	$update_film_sql = 'UPDATE tblFilms SET Name = :title, Year = :year WHERE FilmID = :filmid';
+	$update_film = $db->prepare($update_film_sql);
+	$update_film->execute(array(':title' => $title, ':year' => $year, ':filmid' => $filmid)) or die(print_r($db->errorInfo(), true));
+
+	# setting RecordStatusID = 2 for each updated/deleted tag for this FilmID
+	$remove_filmtags_sql = 'UPDATE tblFilmTags SET RecordStatusID = 2 WHERE FilmID = :filmid';
+	$remove_filmtags = $db->prepare($remove_filmtags_sql);
+	$remove_filmtags->execute(array(':filmid' => $filmid)) or die(print_r($db->errorInfo(), true));
+	
+	# inserting the new tag values for this film
+	foreach ($update_tags as $update) {
+		echo $update;
+		$insert_filmtags_sql = 'INSERT INTO tblFilmTags (FilmID, TagID) VALUES (:filmid, :tagid)';
+		$insert_filmtags = $db->prepare($insert_filmtags_sql);
+		$insert_filmtags->execute(array(':filmid' => $filmid, ':tagid' => $update)) or die(print_r($db->errorInfo(), true));
+	}
+	
+	# redirecting to newly-created film page
+	header('Location: films?id=' . $filmid);
+}
+}
 ?>

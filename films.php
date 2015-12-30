@@ -20,12 +20,22 @@ $select_films_sql = '	SELECT 	f.Name, f.Year, t.TagName, t.TagID
 			WHERE 	(f.FilmID = :filmid)';
 $select_films = $db->prepare($select_films_sql);
 $select_films->execute(array(':filmid' => $filmid)) or die(print_r($db->errorInfo(), true));
-
-$tags = [];
-$tag_ids = [];
 while ($rows = $select_films->fetch(PDO::FETCH_ASSOC)) {
 	$title = $rows["Name"];
 	$filmyear = $rows["Year"];
+}
+
+# getting existing tags for this filmid
+$select_tags_sql = '	SELECT 	t.TagName, t.TagID 
+			FROM 	tblFilmTags AS ft LEFT JOIN
+				tbll_Tags AS t on t.TagID = ft.TagID
+			WHERE 	(ft.FilmID = :filmid) AND (ft.RecordStatusID = 1)';
+$select_tags = $db->prepare($select_tags_sql);
+$select_tags->execute(array(':filmid' => $filmid)) or die(print_r($db->errorInfo(), true));
+
+$tags = [];
+$tag_ids = [];
+while ($rows = $select_tags->fetch(PDO::FETCH_ASSOC)) {
 	array_push($tags, $rows["TagName"]);
 	array_push($tag_ids, $rows["TagID"]);
 }
