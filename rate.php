@@ -81,6 +81,7 @@ for ($i = 0; $i < count($userids); $i++) {
 		<td>
 		<select name="' . $userids[$i] . '">
 			<option selected value="' . $ratings[$userids[$i]] . '">' . $ratings[$userids[$i]] . '</option>
+			<option value="">Delete</option>
 			<option value="0">0</option>
 			<option value="0.5">0.5</option>
 			<option value="1">1</option>
