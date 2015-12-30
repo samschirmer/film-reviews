@@ -16,6 +16,15 @@ td {
 
 /* ####################################
 
+	DASHBOARD TABLE STUFF
+
+###################################### */
+.film_leaderboard td:first-child, .user_leaderboard td:first-child {
+	width: 350px;
+}
+
+/* ####################################
+
 	TAG TABLE STUFF
 
 ###################################### */
@@ -43,3 +52,57 @@ td {
 	color: #dfdfdf;
 	text-decoration: none;
 }
+
+#user_averages {
+	color: #fff;
+	background-color: #000;	
+}
+
+.rating_none {
+	background-color: #aaaaaa;
+}
+
+.rating_0 {
+	background-color: #cc0000;
+}
+
+.rating_0_5 {
+	background-color: #e60000;
+}
+
+.rating_1 {
+	background-color: #ff666a;
+}
+
+.rating_1_5 {
+	background-color: #ff8080;
+}
+
+.rating_2 {
+	background-color: #ffb3b3;
+}
+
+.rating_2_5 {
+	background-color: #ffcc99;
+}
+
+.rating_3 {
+	background-color: #ffffcc;
+}
+
+.rating_3_5 {
+	background-color: #d6f5d6;
+}
+
+.rating_4 {
+	background-color: #adebad;
+}
+
+.rating_4_5 {
+	background-color: #70dc70;
+}
+
+.rating_5 {
+	background-color: #32cd32;
+}
+

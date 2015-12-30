@@ -30,7 +30,6 @@ while ($rows = $select_user->fetch(PDO::FETCH_ASSOC)) {
 	echo '	<tr>
 			<td>' . $firstname . '</td>
 			<td>' . $lastname . '</td>
-			<td>' . $tags . '</td>
 		</tr>
 	';
 }
@@ -45,7 +44,7 @@ $select_reviews_sql = '	SELECT 	r.Rating, f.FilmID, f.Name, f.Year
 $select_reviews = $db->prepare($select_reviews_sql);
 $select_reviews->execute(array(':userid' => $userid)) or die(print_r($db->errorInfo(), true));
 
-echo '<table>';
+echo '<table class="user_leaderboard">';
 while ($rows = $select_reviews->fetch(PDO::FETCH_ASSOC)) {
 	$filmid = $rows["FilmID"];
 	$title = $rows["Name"];

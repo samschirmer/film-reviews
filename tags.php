@@ -121,9 +121,24 @@ while ($rows = $select_orphans->fetch(PDO::FETCH_ASSOC)) {
 # calculates the average
 #
 ################################
+$all_avg = [];
 function getAverage($curr_col, $max_cols, $row_rating) {
+	global $all_avg;
 	if ($curr_col == $max_cols) {
-		echo '<td><strong>' . round((array_sum($row_rating) / count($row_rating)), 2) . '</strong></td>'; 
+		$avg = round((array_sum($row_rating) / count($row_rating)), 2);
+		$rounded_rating = round($avg * 2, 0) / 2;
+		$decimal_flag = strlen(strval($rounded_rating));
+		if ($decimal_flag > 1) {
+			$str_rating = strval($rounded_rating);
+			$base_rating = explode(".", $str_rating);
+			$rating_css_class = $base_rating[0] . '_5';
+		} else {
+			$rating_css_class = $rounded_rating;
+		}
+		echo '<td class="rating_' . $rating_css_class  . '">';
+
+		echo '<strong>' . $avg . '</strong></td>'; 
+		array_push($all_avg, $avg);
 		return 1;
 	} else {
 		return 0;
@@ -146,7 +161,7 @@ while ($col_counter < count($column_order)) {
 			##########
 			# hacky loop to fill in blank <td>s to end of row after last rating BEFORE making a new line
 				while (($shitty_hack == 1) and ($col_counter < count($column_order))) {
-					echo '<td>&nbsp;</td>';
+					echo '<td class="rating_none">&nbsp;</td>';
 					# checking for end-of-row and appending average column
 					if ((count($column_order) - $col_counter == 1) and ($avg_flag == 0)) {
 						$avg_flag = getAverage($column_order[$col_counter], count($column_order), $all_ratings);
@@ -178,7 +193,7 @@ while ($col_counter < count($column_order)) {
 		# this row contains ratings, but none for this column; drop a &nbsp in a <td>
 			if (($column_order[$col_counter] != $row["userid"]) and ($col_counter < count($column_order))) {
 				while (($column_order[$col_counter] != $row["userid"]) and ($col_counter < count($column_order))) {
-					echo '<td>&nbsp;</td>';
+					echo '<td class="rating_none">&nbsp;</td>';
 					# checking for end-of-row and appending average column
 					if ((count($column_order) - $col_counter == 1) and ($avg_flag == 0)) {
 						$avg_flag = getAverage($column_order[$col_counter], count($column_order), $all_ratings);
@@ -193,7 +208,13 @@ while ($col_counter < count($column_order)) {
 
 		# if there IS a rating in this column (for this row)
 			if (($column_order[$col_counter] == $row["userid"]) and ($col_counter < count($column_order))) {
-				echo '<td>';
+				if (strlen($row["rating"]) > 1) {
+					$base_rating = explode(".", $row["rating"]);
+					$rating_css_class = $base_rating[0] . '_5';
+				} else {
+					$rating_css_class = $row["rating"];
+				}
+				echo '<td class="rating_' . $rating_css_class  . '">';
 				echo $row["rating"];
 				echo '</td>';
 				array_push($all_ratings, $row["rating"]);
@@ -207,7 +228,30 @@ while ($col_counter < count($column_order)) {
 }	
 
 # getting user averages
-# TODO
+echo '<tr id="user_averages"><td>Average</td>';
+
+for ($i = 0; $i < $num_users; $i++) {
+	$curr_array = $userids[$i];
+	$curr_id = $curr_array["userid"];
+
+	$select_user_avg_sql = 'SELECT 	AVG(r.Rating) AS Average 
+				FROM 	tblUsers AS u LEFT JOIN
+					tblRatings AS r ON r.UserID = u.UserID LEFT JOIN
+					tblFilms AS f ON f.FilmID = r.FilmID LEFT JOIN
+					tblFilmTags AS ft ON ft.FilmID = f.FilmID
+				WHERE 	(ft.TagID = :tagid) AND (u.UserID = :userid) AND 
+					((u.RecordStatusID = 1) AND (r.RecordStatusID = 1) AND (f.RecordStatusID = 1) AND (ft.RecordStatusID = 1))
+				ORDER BY u.UserID';
+	$select_user_avg = $db->prepare($select_user_avg_sql);
+	$select_user_avg->execute(array(':tagid' => $tagid, ':userid' => $curr_id)) or die(print_r($db->errorInfo(), true));
+	
+	while ($rows = $select_user_avg->fetch(PDO::FETCH_ASSOC)) {
+		$avg = $rows["Average"];
+	}
+	
+	echo '<td><strong>' . round($avg, 2) . '</strong></td>';
+}
+echo '<td><strong>' . round((array_sum($all_avg) / (count($all_avg))), 2)  . '</strong></td></tr>';
 
 echo '</table>';
 ?>
