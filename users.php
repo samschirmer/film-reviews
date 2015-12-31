@@ -1,14 +1,7 @@
-<html>
-
-<head>
-	<title>This is a demo</title>
-	<link rel="stylesheet" href="style.css" />
-</head>
-
-<body>
-
 <?php
 include 'php/config.php';
+
+if (isset($_GET['id'])) {
 
 $userid = $_GET['id'];
 
@@ -59,6 +52,60 @@ while ($rows = $select_reviews->fetch(PDO::FETCH_ASSOC)) {
 	';
 }
 echo '</table>';
+}
+#####################################
+#
+#  Default; no userid set
+#
+#####################################
+else {
+
+echo '<div class="row">
+	<div class="col-xl-12">
+	<div class="panel panel-primary div-center">
+	<div class="panel-heading">
+		<h1 class="panel-title">Users List</h1>
+	</div>
+	<div class="panel-body">
+	<table>
+	<tr><td>Name</td><td># Ratings</td><td>Avg. Rating</td></tr>';
+# Getting film metadata
+$select_users_sql = '	SELECT DISTINCT	u.UserID, u.FirstName, u.LastName
+			FROM 		tblUsers AS u LEFT JOIN
+					tblRatings AS r ON r.UserID = u.UserID
+			WHERE		(u.RecordStatusID = 1) AND (r.RecordStatusID = 1)
+			';
+$select_users = $db->prepare($select_users_sql);
+$select_users->execute() or die(print_r($db->errorInfo(), true));
+while ($rows = $select_users->fetch(PDO::FETCH_ASSOC)) {
+	$fname = $rows["FirstName"];
+	$lname = $rows["LastName"];
+	$userid = $rows["UserID"];
+
+	$select_avg_sql = '	SELECT 	Rating
+				FROM 	tblRatings 
+				WHERE	(UserID = :userid) AND (RecordStatusID = 1)
+				';
+	$select_avg = $db->prepare($select_avg_sql);
+	$select_avg->execute(array(':userid' => $userid)) or die(print_r($db->errorInfo(), true));
+
+	$u_ratings = [];
+	while ($avg = $select_avg->fetch(PDO::FETCH_ASSOC)) {
+	array_push($u_ratings, $avg["Rating"]);
+	}
+
+	$u_avg = array_sum($u_ratings) / count($u_ratings);
+	echo '<tr>
+			<td><a href="users?id=' . $userid . '">' . $fname . ' ' . $lname . '</a></td>
+			<td>' . count($u_ratings) . '</td>
+			<td>' . round($u_avg, 2) . '</td>
+		</tr>';
+}
+echo '</table>
+</div></div>';
+}
+
+
+require_once 'php/footer.php';
+
 ?>
-</body>
-</html>

@@ -1,12 +1,3 @@
-<html>
-
-<head>
-	<title>This is a demo</title>
-	<link rel="stylesheet" href="style.css" />
-</head>
-
-<body>
-
 <?php
 include 'php/config.php';
 
@@ -23,7 +14,6 @@ if ($error_type == "dupe_film") {
 } else {
 	echo '<h1>Something went wrong.</h1>';
 }
-?>
 
-</body>
-</html>
+require_once 'php/footer.php';
+?>

@@ -1,12 +1,3 @@
-<html>
-
-<head>
-	<title>This is a demo</title>
-	<link rel="stylesheet" href="style.css" />
-</head>
-
-<body>
-
 <?php
 include 'php/config.php';
 
@@ -67,7 +58,7 @@ while ($rows = $select_reviews->fetch(PDO::FETCH_ASSOC)) {
 }
 
 echo '
-<form action="submit.php" method="POST">';
+<form action="php/submit" method="POST">';
 
 $last_id = 0;
 for ($i = 0; $i < count($userids); $i++) {
@@ -130,6 +121,5 @@ echo '
 ';
 echo '<button type="submit">Submit</button>
 	</form>';
+require_once 'php/footer.php';
 ?>
-</body>
-</html>

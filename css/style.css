@@ -1,17 +1,24 @@
+html {
+	overflow-y: scroll;
+}
+
 body {
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 14px;
+	padding-left: 45px;
+	padding-right: 45px;
 }
 
 table {
 	border-collapse: collapse;
-	margin: 10px;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 td {
 	border: 1px solid #000;
 	text-align: center;
-	width: 80px;
+	padding: 5px;
 }
 
 /* ####################################
@@ -19,8 +26,17 @@ td {
 	DASHBOARD TABLE STUFF
 
 ###################################### */
+.film_leaderboard, .user_leaderboard {
+	margin-top: 5px;
+	margin-bottom: 10px;
+}
+
 .film_leaderboard td:first-child, .user_leaderboard td:first-child {
 	width: 350px;
+}
+
+.film_leaderboard td, .user_leaderboard td{
+	font-size: 12px;
 }
 
 /* ####################################
@@ -106,3 +122,17 @@ td {
 	background-color: #32cd32;
 }
 
+/* #########################
+#
+#	MISC
+#
+######################### */
+
+.div-centered {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.centered {
+	text-align: center;
+}

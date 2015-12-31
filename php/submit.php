@@ -1,5 +1,5 @@
 <?php
-include 'php/config.php';
+$db = new PDO('sqlite:../db/movies.db') or die("fail to connect db");
 
 $submit_type = $_POST["type"];
 
@@ -75,7 +75,7 @@ for ($i = 0; $i <= $last_id; $i++) {
 	}
 }
 
-header('Location: films?id=' . $filmid);
+header('Location: ../films?id=' . $filmid);
 }
 
 ##########################################
@@ -100,7 +100,7 @@ while ($rows = $select_dupes->fetch(PDO::FETCH_ASSOC)) {
 
 if (count($dupes) > 0) {
 	# redirecting to error page
-	header('Location: error?type=dupe_film&id=' . $dupes[0]);
+	header('Location: ../error?type=dupe_film&id=' . $dupes[0]);
 } else {
 	# insert query
 	$insert_film_sql = 'INSERT INTO tblFilms (Name, Year) VALUES (:title, :year)';
@@ -116,7 +116,7 @@ if (count($dupes) > 0) {
 		$filmid = $rows["FilmID"];
 	}
 	# redirecting to newly-created film page
-	header('Location: films?id=' . $filmid);
+	header('Location: ../films?id=' . $filmid);
 }
 }
 ##########################################
@@ -140,7 +140,7 @@ while ($rows = $select_dupes->fetch(PDO::FETCH_ASSOC)) {
 
 if (count($dupes) > 0) {
 	# redirecting to error page
-	header('Location: error?type=dupe_tag&id=' . $dupes[0]);
+	header('Location: ../error?type=dupe_tag&id=' . $dupes[0]);
 } else {
 	# insert query
 	$insert_tag_sql = 'INSERT INTO tbll_Tags (TagName) VALUES (:tag_name)';
@@ -156,7 +156,7 @@ if (count($dupes) > 0) {
 		$tagid = $rows["TagID"];
 	}
 	# redirecting to newly-created film page
-	header('Location: tags?id=' . $tagid);
+	header('Location: ../tags?id=' . $tagid);
 }
 }
 
@@ -197,7 +197,7 @@ for ($i = 1; $i <= $num_tags; $i++) {
 
 if ((count($dupes) > 0) and ($tag_change_flag == 0)) {
 	# redirecting to error page
-	header('Location: error?type=dupe_film&id=' . $dupes[0]);
+	header('Location: ../error?type=dupe_film&id=' . $dupes[0]);
 } else {
 
 	# update film query
@@ -219,7 +219,7 @@ if ((count($dupes) > 0) and ($tag_change_flag == 0)) {
 	}
 	
 	# redirecting to newly-created film page
-	header('Location: films?id=' . $filmid);
+	header('Location: ../films?id=' . $filmid);
 }
 }
 ?>

@@ -1,12 +1,3 @@
-<html>
-
-<head>
-	<title>This is a demo</title>
-	<link rel="stylesheet" href="style.css" />
-</head>
-
-<body>
-
 <?php
 include 'php/config.php';
 
@@ -255,6 +246,6 @@ for ($i = 0; $i < $num_users; $i++) {
 echo '<td><strong>' . round((array_sum($all_avg) / (count($all_avg))), 2)  . '</strong></td></tr>';
 
 echo '</table>';
+
+require_once 'php/footer.php';
 ?>
-</body>
-</html>
