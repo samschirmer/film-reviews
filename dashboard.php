@@ -29,12 +29,11 @@ echo '<div class="col-md-12">
 		<h3 class="panel-title">Highest Rated Films</h3>
 	</div>
 	<div class="panel-body">
-	<table class="film_leaderboard">
+	<table class="dashboard_sidebar">
 		<tr>
 			<td>Film</td><td>Year</td><td>Rating</td>
 		</tr>';
 
-$i = 0;
 while ($rows = $select_films->fetch(PDO::FETCH_ASSOC)) {
 	$title = $rows["Name"];
 	$filmid = $rows["FilmID"];
@@ -59,9 +58,9 @@ echo '<div class="col-md-12">
 		<h3 class="panel-title">Most Active Reviewers</h3>
 	</div>
 	<div class="panel-body">
-	<table class="film_leaderboard">
+	<table class="dashboard_sidebar">
 		<tr>
-			<td>User</td><td>Reviews</td><td>Rating</td>
+			<td>User</td><td># Reviews</td><td>Avg Rating</td>
 		</tr>';
 
 $select_users_sql = '	SELECT 	u.*, AVG(r.Rating) AS Average, COUNT(r.Rating) AS Total 
@@ -98,9 +97,9 @@ echo '<div class="col-md-12">
 		<h3 class="panel-title">Highest Average Rating</h3>
 	</div>
 	<div class="panel-body">
-	<table class="film_leaderboard">
+	<table class="dashboard_sidebar">
 		<tr>
-			<td>User</td><td>Reviews</td><td>Rating</td>
+			<td>User</td><td># Reviews</td><td>Avg Rating</td>
 		</tr>';
 
 $select_users_sql = '	SELECT 	u.*, AVG(r.Rating) AS Average, COUNT(r.Rating) AS Total 

@@ -41,11 +41,50 @@ echo '<div class="row">
 				<tr>	<td>' . $firstname . ' ' . $lastname . '</td>
 					<td>' . $rating_counter . '</td>
 					<td>' . round(($rating_sum / $rating_counter), 2) . '</td>
-				</tr>';
-echo'			</table>';
+				</tr>
+			</table>';
+echo '		</ul>';
+# ending user stats box
 echo '		</div>
-		</div>
-	</div>';		
+		</div>';
+
+
+echo'		<div class="panel panel-primary">
+			<div class="panel-heading">
+			<h1 class="panel-title">Favorite Films</h1>
+			</div>
+		<div class="panel-body">';
+
+# query to find top films' ratings and titles
+$select_top_ratings_sql = '	SELECT 	f.FilmID, f.Name, r.Rating 
+				FROM 	tblFilms AS f LEFT JOIN
+					tblRatings AS r ON r.FilmID = f.FilmID 
+				WHERE 	(r.UserID = :userid) AND (f.RecordStatusID = 1) AND
+					(r.RecordStatusID = 1) 
+				ORDER BY r.Rating DESC, f.Name
+				LIMIT 10';
+$select_top_ratings = $db->prepare($select_top_ratings_sql);
+$select_top_ratings->execute(array(':userid' => $userid)) or die(print_r($db->errorInfo(), true));
+
+echo '<table class="fav_films">
+	<tr><td>Rank</td><td>Title</td><td>Rating</td></tr>';
+$count = 1;
+while ($rows = $select_top_ratings->fetch(PDO::FETCH_ASSOC)) {
+	echo '	<tr>
+			<td>' . $count . '</td>
+			<td><a href="films?id=' . $rows["FilmID"] . '">' . $rows["Name"] . '</a></td>
+			<td>' . $rows["Rating"]  . '</td>
+		</tr>';
+	$count ++;
+}
+echo '</table>';
+
+# ending favorite films box
+echo '		</div>
+		</div>';
+
+# ending column
+echo'	</div>';		
 
 # Getting reviews
 $select_reviews_sql = '	SELECT 	r.Rating, f.FilmID, f.Name, f.Year 
@@ -62,9 +101,8 @@ echo'	<div class="col-sm-6">
 			</div>
 		<div class="panel-body">
 			<table class="user_leaderboard">
-				<tr><td>Name</td><td># Ratings</td><td>Avg. Rating</td></tr>';
+				<tr><td>Title</td><td>Year</td><td>Rating</td></tr>';
 				# insert table data here
-
 while ($rows = $select_reviews->fetch(PDO::FETCH_ASSOC)) {
 	$filmid = $rows["FilmID"];
 	$title = $rows["Name"];
@@ -74,7 +112,7 @@ while ($rows = $select_reviews->fetch(PDO::FETCH_ASSOC)) {
 			echo '	<tr>
 					<td><a href="films?id=' . $filmid . '">' . $title . '</a></td>
 					<td>' . $filmyear . '</td>
-					<td>' . $rating . '</td>
+					<td><strong>' . $rating . '</strong></td>
 				</tr>';
 }
 		echo '	</table>';

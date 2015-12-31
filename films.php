@@ -33,15 +33,77 @@ while ($rows = $select_tags->fetch(PDO::FETCH_ASSOC)) {
 	array_push($tag_ids, $rows["TagID"]);
 }
 	
-echo '<h1>' . $title . ' - ' . $filmyear . '</h1>';
-echo '<h2>Tags</h2>';
-echo '<ul>';
-
-# iterating through tags and populating list
-for ($i = 0; $i < count($tags); $i++) {
-	echo '<li><a href="tags?id=' . $tag_ids[$i] . '">' . $tags[$i] . '</a></li>';
+# Getting film metadata
+$select_ratings_sql = '	SELECT 	Rating 
+			FROM 	tblRatings 
+			WHERE 	(FilmID = :filmid) AND (RecordStatusID = 1)';
+$select_ratings = $db->prepare($select_ratings_sql);
+$select_ratings->execute(array(':filmid' => $filmid)) or die(print_r($db->errorInfo(), true));
+$rating_counter = 0;
+$rating_sum = 0;
+while ($rows = $select_ratings->fetch(PDO::FETCH_ASSOC)) {
+	$rating_sum += $rows["Rating"];	
+	$rating_counter ++;
 }
-echo '</ul>';
+
+echo '<div class="row">
+	<div class="col-sm-6">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+			<h1 class="panel-title">' . $title  . ' - ' . $filmyear . '</h1>
+			</div>
+		<div class="panel-body">
+			<table>
+				<tr><td># Reviews</td><td>Avg. Rating</td></tr>
+				<tr>	
+					<td>' . $rating_counter . '</td>
+					<td><strong>' . round(($rating_sum / $rating_counter), 2) . '</strong></td>
+				</tr>
+			</table>';
+
+
+# rating button
+echo '<div class="centered review_button">';
+echo '<a href="rate?id=' . $filmid . '"><button class="btn btn-primary btn-lg">Rate this film</button></a>';
+echo '</div>';
+
+
+# ending user stats box
+echo '		</div>
+		</div>';
+
+
+
+echo'		<div class="panel panel-primary">
+			<div class="panel-heading">
+			<h1 class="panel-title">Tags</h1>
+			</div>
+		<div class="panel-body">
+			<table class="film_tags_table">';	
+
+				# iterating through tags and populating list
+				for ($i = 0; $i < count($tags); $i++) {
+					echo '<tr><td><a href="tags?id=' . $tag_ids[$i] . '">' . $tags[$i] . '</a></td></tr>';
+				}
+echo'			</table>';
+echo '		</ul>';
+# ending tags box
+echo '		</div>
+		</div>';
+
+# closing column
+echo '	</div>';
+
+
+
+echo '<div class="col-sm-6">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+			<h1 class="panel-title">All Ratings</h1>
+			</div>
+		<div class="panel-body">
+			<table>
+				<tr><td>User</td><td>Rating</td></tr>';
 
 # Getting reviews
 $select_reviews_sql = '	SELECT 	r.Rating, u.UserID, u.FirstName, u.LastName
@@ -51,8 +113,6 @@ $select_reviews_sql = '	SELECT 	r.Rating, u.UserID, u.FirstName, u.LastName
 $select_reviews = $db->prepare($select_reviews_sql);
 $select_reviews->execute(array(':filmid' => $filmid)) or die(print_r($db->errorInfo(), true));
 
-echo '<h2>Ratings</h2>';
-echo '<table>';
 while ($rows = $select_reviews->fetch(PDO::FETCH_ASSOC)) {
 	$userid = $rows["UserID"];
 	$firstname = $rows["FirstName"];
@@ -67,7 +127,11 @@ while ($rows = $select_reviews->fetch(PDO::FETCH_ASSOC)) {
 }
 echo '</table>';
 
-echo '<h3><a href="rate?id=' . $filmid . '">Rate this film</a></h3>';
+# closing panel body and panel div
+echo '</div></div>';
+# closing column and row
+echo '</div></div>';
+
 }
 
 #####################################

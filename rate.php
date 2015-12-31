@@ -32,7 +32,7 @@ $select_users = $db->prepare($select_users_sql);
 $select_users->execute() or die(print_r($db->errorInfo(), true));
 
 echo '
-<table>';
+<table class="user_review_table">';
 $firstnames = [];
 $lastnames = [];
 $userids = [];
@@ -119,7 +119,10 @@ echo '
 <input type="hidden" name="filmid" value="' . $filmid . '" />
 <input type="hidden" name="last_id" value="' . $last_id . '" />
 ';
-echo '<button type="submit">Submit</button>
-	</form>';
+
+echo '<br />';
+echo '<div class="centered">';
+echo '<button type="submit" class="btn btn-primary btn-lg">Submit</button>';
+echo '</div></form>';
 require_once 'php/footer.php';
 ?>
