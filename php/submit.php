@@ -155,8 +155,51 @@ if (count($dupes) > 0) {
 	while ($rows = $select_new_tag->fetch(PDO::FETCH_ASSOC)) {
 		$tagid = $rows["TagID"];
 	}
-	# redirecting to newly-created film page
+	# redirecting to newly-created tag page
 	header('Location: ../tags?id=' . $tagid);
+}
+}
+
+
+##########################################
+#
+#	ADD NEW USER
+#
+##########################################
+elseif ($submit_type == "add_user") {
+
+$firstname = $_POST["firstname"];
+$lastname = $_POST["lastname"];
+$dupes = [];
+
+# checking for duplicates based on title
+$select_dupes_sql = 'SELECT UserID FROM tblUsers WHERE (RecordStatusID = 1) AND ((FirstName = :firstname) AND (LastName = :lastname))';
+$select_dupes = $db->prepare($select_dupes_sql);
+$select_dupes->execute(array(':firstname' => $firstname, ':lastname' => $lastname)) or die(print_r($db->errorInfo(), true));
+
+while ($rows = $select_dupes->fetch(PDO::FETCH_ASSOC)) {
+	array_push($dupes, $row["UserID"]);
+}
+
+if (count($dupes) > 0) {
+	# redirecting to error page
+	header('Location: ../error?type=dupe_user&id=' . $dupes[0]);
+} else {
+	# insert query
+	$insert_user_sql = 'INSERT INTO tblUsers (FirstName, LastName) VALUES (:firstname, :lastname)';
+	$insert_user = $db->prepare($insert_user_sql);
+	$insert_user->execute(array(':firstname' => $firstname, ':lastname' => $lastname)) or die(print_r($db->errorInfo(), true));
+	
+	# pulling userid for redirect
+	$select_new_user_sql = 'SELECT UserID FROM tblUsers WHERE (RecordStatusID = 1) ORDER BY UserID DESC LIMIT 1';
+	$select_new_user = $db->prepare($select_new_user_sql);
+	$select_new_user->execute() or die(print_r($db->errorInfo(), true));
+	
+	while ($rows = $select_new_user->fetch(PDO::FETCH_ASSOC)) {
+		$userid = $rows["UserID"];
+	}
+	# redirecting to newly-created user page
+	header('Location: ../users?id=' . $userid);
 }
 }
 

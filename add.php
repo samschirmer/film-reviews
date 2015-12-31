@@ -21,6 +21,16 @@ if ($add_type == "film") {
 	echo '<input name="type" type="hidden" value="add_tag" />';
 	echo '<button type="submit">Submit</button>';
 	echo '</form>';
+
+} elseif ($add_type == "user") {
+
+	echo '<h1>Add User</h1>';
+	echo '<form action="php/submit" method="POST">';
+	echo '<input name="firstname" placeholder="Enter First Name" />';
+	echo '<input name="lastname" placeholder="Enter Last Name" />';
+	echo '<input name="type" type="hidden" value="add_user" />';
+	echo '<button type="submit">Submit</button>';
+	echo '</form>';
 }
 
 require_once 'php/footer.php';

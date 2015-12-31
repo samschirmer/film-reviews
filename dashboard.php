@@ -13,8 +13,10 @@ $select_films = $db->prepare($select_films_sql);
 $select_films->execute() or die(print_r($db->errorInfo(), true));
 
 echo '<div class="row">
-	<div class="col-md-8">
-		<p>Paragraphs here</p>
+	<div class="col-sm-8">
+		<div class="centered col-sm-12">
+		<img class="img-rounded img-responsive db-img" src="http://imgur.com/tWfRpki.jpg" />
+		</div>
 	</div> <!-- closing main body -->
 	
 	<!-- sidebar -->

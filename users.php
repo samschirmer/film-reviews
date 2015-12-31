@@ -6,28 +6,46 @@ if (isset($_GET['id'])) {
 $userid = $_GET['id'];
 
 # Getting user metadata
-$select_user_sql = '	SELECT 	u.FirstName, u.LastName, t.TagName 
-			FROM 	tblUsers AS u LEFT JOIN 
-				tblUserTags AS ut ON ut.UserID = u.UserID LEFT JOIN
-				tbll_Tags AS t on t.TagID = ut.TagID
-			WHERE 	(u.UserID = :userid)';
+$select_user_sql = '	SELECT 	FirstName, LastName 
+			FROM 	tblUsers 
+			WHERE 	(UserID = :userid)';
 $select_user = $db->prepare($select_user_sql);
 $select_user->execute(array(':userid' => $userid)) or die(print_r($db->errorInfo(), true));
-
-echo '<table>';
 while ($rows = $select_user->fetch(PDO::FETCH_ASSOC)) {
 	$firstname = $rows["FirstName"];
 	$lastname = $rows["LastName"];
-	$tags = $rows["TagName"];
-
-	echo '	<tr>
-			<td>' . $firstname . '</td>
-			<td>' . $lastname . '</td>
-		</tr>
-	';
 }
-echo '</table>';
 
+# Getting user metadata
+$select_ratings_sql = '	SELECT 	Rating 
+			FROM 	tblRatings 
+			WHERE 	(UserID = :userid) AND (RecordStatusID = 1)';
+$select_ratings = $db->prepare($select_ratings_sql);
+$select_ratings->execute(array(':userid' => $userid)) or die(print_r($db->errorInfo(), true));
+$rating_counter = 0;
+$rating_sum = 0;
+while ($rows = $select_ratings->fetch(PDO::FETCH_ASSOC)) {
+	$rating_sum += $rows["Rating"];	
+	$rating_counter ++;
+}
+
+echo '<div class="row">
+	<div class="col-sm-6">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+			<h1 class="panel-title">User Stats</h1>
+			</div>
+		<div class="panel-body">
+			<table>
+				<tr><td>Name</td><td># Ratings</td><td>Avg. Rating</td></tr>
+				<tr>	<td>' . $firstname . ' ' . $lastname . '</td>
+					<td>' . $rating_counter . '</td>
+					<td>' . round(($rating_sum / $rating_counter), 2) . '</td>
+				</tr>';
+echo'			</table>';
+echo '		</div>
+		</div>
+	</div>';		
 
 # Getting reviews
 $select_reviews_sql = '	SELECT 	r.Rating, f.FilmID, f.Name, f.Year 
@@ -37,21 +55,33 @@ $select_reviews_sql = '	SELECT 	r.Rating, f.FilmID, f.Name, f.Year
 $select_reviews = $db->prepare($select_reviews_sql);
 $select_reviews->execute(array(':userid' => $userid)) or die(print_r($db->errorInfo(), true));
 
-echo '<table class="user_leaderboard">';
+echo'	<div class="col-sm-6">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+			<h1 class="panel-title">Reviews</h1>
+			</div>
+		<div class="panel-body">
+			<table class="user_leaderboard">
+				<tr><td>Name</td><td># Ratings</td><td>Avg. Rating</td></tr>';
+				# insert table data here
+
 while ($rows = $select_reviews->fetch(PDO::FETCH_ASSOC)) {
 	$filmid = $rows["FilmID"];
 	$title = $rows["Name"];
 	$filmyear = $rows["Year"];
 	$rating = $rows["Rating"];
 	
-	echo '	<tr>
-			<td><a href="films?id=' . $filmid . '">' . $title . '</a></td>
-			<td>' . $filmyear . '</td>
-			<td>' . $rating . '</td>
-		</tr>
-	';
+			echo '	<tr>
+					<td><a href="films?id=' . $filmid . '">' . $title . '</a></td>
+					<td>' . $filmyear . '</td>
+					<td>' . $rating . '</td>
+				</tr>';
 }
-echo '</table>';
+		echo '	</table>';
+	echo '	</div>
+		</div>
+	</div>
+</div>';
 }
 #####################################
 #
@@ -95,7 +125,7 @@ while ($rows = $select_users->fetch(PDO::FETCH_ASSOC)) {
 	}
 
 	$u_avg = array_sum($u_ratings) / count($u_ratings);
-	echo '<tr>
+	echo '	<tr>
 			<td><a href="users?id=' . $userid . '">' . $fname . ' ' . $lname . '</a></td>
 			<td>' . count($u_ratings) . '</td>
 			<td>' . round($u_avg, 2) . '</td>

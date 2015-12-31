@@ -128,7 +128,7 @@ td {
 #
 ######################### */
 
-.div-centered {
+.margin-centered {
 	margin-left: auto;
 	margin-right: auto;
 }
@@ -136,3 +136,8 @@ td {
 .centered {
 	text-align: center;
 }
+
+.db-img {
+	margin-bottom: 5%;
+}
+
