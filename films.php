@@ -80,7 +80,7 @@ echo '<div class="centered review_button">
 # edit button
 echo '<div class="col-sm-6">
 	<div class="centered review_button">
-	<a href="edit?id=' . $filmid . '"><button class="btn btn-primary btn-lg">Edit this film</button></a>
+	<a href="edit?type=film&id=' . $filmid . '"><button class="btn btn-primary btn-lg">Edit this film</button></a>
 </div></div>';
 
 # ending row
