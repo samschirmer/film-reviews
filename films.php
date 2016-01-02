@@ -6,7 +6,7 @@ if (isset($_GET['id'])) {
 $filmid = $_GET['id'];
 
 # Getting film metadata
-$select_films_sql = '	SELECT 	f.Name, f.Year, t.TagName, t.TagID 
+$select_films_sql = '	SELECT 	f.Name, f.Year, t.TagName, t.TagID, f.CreatedDT 
 			FROM 	tblFilms AS f LEFT JOIN 
 				tblFilmTags AS ft ON ft.FilmID = f.FilmID LEFT JOIN
 				tbll_Tags AS t on t.TagID = ft.TagID
@@ -16,7 +16,14 @@ $select_films->execute(array(':filmid' => $filmid)) or die(print_r($db->errorInf
 while ($rows = $select_films->fetch(PDO::FETCH_ASSOC)) {
 	$title = $rows["Name"];
 	$filmyear = $rows["Year"];
+	$ugly_date = $rows["CreatedDT"];
 }
+
+# formatting date to not suck
+$bad_date = explode(' ',$ugly_date);
+$broken_date = explode('-', $bad_date[0]);
+$createddt = $broken_date[1] . '/' . $broken_date[2] . '/' . $broken_date[0];
+
 
 # getting existing tags for this filmid
 $select_tags_sql = '	SELECT 	t.TagName, t.TagID 
@@ -54,18 +61,31 @@ echo '<div class="row">
 			</div>
 		<div class="panel-body">
 			<table>
-				<tr><td># Reviews</td><td>Avg. Rating</td></tr>
+				<tr><td>Date Added</td><td># Reviews</td><td>Avg. Rating</td></tr>
 				<tr>	
+					<td>' . $createddt . '</td>
 					<td>' . $rating_counter . '</td>
 					<td><strong>' . round(($rating_sum / $rating_counter), 2) . '</strong></td>
 				</tr>
 			</table>';
 
 
+# buttons row
+echo '<div class="row">
+	<div class="col-sm-6">';
 # rating button
-echo '<div class="centered review_button">';
-echo '<a href="rate?id=' . $filmid . '"><button class="btn btn-primary btn-lg">Rate this film</button></a>';
+echo '<div class="centered review_button">
+	<a href="rate?id=' . $filmid . '"><button class="btn btn-primary btn-lg">Rate this film</button></a>
+</div> </div>';
+# edit button
+echo '<div class="col-sm-6">
+	<div class="centered review_button">
+	<a href="edit?id=' . $filmid . '"><button class="btn btn-primary btn-lg">Edit this film</button></a>
+</div></div>';
+
+# ending row
 echo '</div>';
+
 
 
 # ending user stats box
