@@ -164,6 +164,14 @@ td {
 }
 
 .review_button {
+	text-align: right;
+}
+
+.edit_button {
+	text-align: left;
+}
+
+.review_button, .edit_button {
 	margin-top: 5%;
 }
 

@@ -74,12 +74,12 @@ echo '<div class="row">
 echo '<div class="row">
 	<div class="col-sm-6">';
 # rating button
-echo '<div class="centered review_button">
+echo '<div class="review_button">
 	<a href="rate?id=' . $filmid . '"><button class="btn btn-primary btn-lg">Rate this film</button></a>
 </div> </div>';
 # edit button
 echo '<div class="col-sm-6">
-	<div class="centered review_button">
+	<div class="edit_button">
 	<a href="edit?type=film&id=' . $filmid . '"><button class="btn btn-primary btn-lg">Edit this film</button></a>
 </div></div>';
 
